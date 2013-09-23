@@ -1,9 +1,22 @@
 require 'debugger'
 class Tile
-  attr_accessor :has_bomb, :board, :coord
+  attr_accessor :has_bomb, :board, :coord, :nearby_bombs, :revealed, :flagged
   
   def explore
+    # debugger
+    return :lose if self.has_bomb
+    @nearby_bombs = self.count_neighbor_bombs
+    @revealed = true unless @flagged
+    if @nearby_bombs == 0
+      self.neighbors.each {|neighbor| neighbor.explore unless (neighbor.revealed || neighbor.flagged) }
+    end
+    return nil
+  end   
+  
+  def count_neighbor_bombs
+    self.neighbors.inject(0) { |sum, tile| tile.has_bomb ? (sum + 1) : sum  }
   end
+  
   
   def neighbors
     moves = [
@@ -19,6 +32,8 @@ class Tile
   
   def initialize(board)
     @board = board
+    @revealed = false
+    @flagged = false
   end
 end
 
@@ -53,5 +68,43 @@ class Board
     end
   end
   
-end
+  def print_full_board
+    @tiles.each_with_index do |row, x_coord|
+      row.each_with_index do |col, y_coord|
+        tile = @tiles[x_coord][y_coord]
+        if tile.has_bomb
+          print " X "
+        else
+          num_bombs = tile.count_neighbor_bombs
+          if num_bombs == 0
+            print " _ "
+          else
+            print " #{num_bombs} "
+          end
+        end
+      end
+      puts
+    end
+    return nil
+  end
 
+  def print_user
+    @tiles.each_with_index do |row, x_coord|
+      row.each_with_index do |col, y_coord|
+        tile = @tiles[x_coord][y_coord]
+        if tile.revealed
+          if tile.nearby_bombs == 0
+            print " _ "
+          else
+            print " #{tile.nearby_bombs} "
+          end
+        else
+          print " * "
+        end
+      end
+      puts
+    end
+    return nil
+  end
+  
+end
