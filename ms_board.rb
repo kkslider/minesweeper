@@ -1,7 +1,7 @@
 require './ms_tile.rb'
 
 class Board
-  attr_reader :size, :tiles
+  attr_reader :size, :tiles, :game_lost
   
   def initialize(size=9, bombs=10)
     @tiles = Array.new(size) {Array.new(size) {Tile.new(self)}}
@@ -60,7 +60,9 @@ class Board
       row.each_with_index do |col, y_coord|
         tile = @tiles[x_coord][y_coord]
         if tile.revealed
-          if tile.nearby_bombs == 0
+          if tile.has_bomb
+            print " X "
+          elsif tile.nearby_bombs == 0
             print " _ "
           else
             print " #{tile.nearby_bombs} "

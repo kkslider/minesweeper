@@ -5,13 +5,16 @@ class Tile
   
   def explore
     # debugger
-    return :lose if self.has_bomb
+    if self.has_bomb
+      self.revealed = true
+      return false if self.has_bomb # makes keep_playing false in minesweeper
+    end
     @nearby_bombs = self.count_neighbor_bombs
     @revealed = true unless @flagged
     if @nearby_bombs == 0
       self.neighbors.each {|neighbor| neighbor.explore unless (neighbor.revealed || neighbor.flagged) }
     end
-    return nil
+    true
   end   
   
   def count_neighbor_bombs

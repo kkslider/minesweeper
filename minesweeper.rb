@@ -33,19 +33,26 @@ class Game
   def play
     board = setup
     
-    game_over = false
+    keep_playing = true
     # loop here
-    until game_over
+    while keep_playing
       board.print_user
       action = validate_input("Flag or Reveal?", :String) {|x| ["f","r"].include?(x)}
       tile_coord = validate_input("Which tile?", :Array) {|x| x.all? { |coord| coord < board.size && coord >= 0 } }
       tile = board.tiles[tile_coord[0]][tile_coord[1]]
-      game_result = tile.explore if action == "r"
+      keep_playing = tile.explore if action == "r"
       
-      
-      # handle instant lose case
       tile.flagged = true if action == "f"
-      game_over = board.game_over?
+      keep_playing = !board.game_over? unless !keep_playing
     end
+    board.print_user
+    
+    lost = board.tiles.any? do |row|
+      row.any? { |tile| tile.has_bomb && tile.revealed }
+    end
+    
+    
+    lost ? (puts "You lose!!!!") : (puts "You win!!!!")
+    
   end
 end
