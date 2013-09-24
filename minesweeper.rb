@@ -3,6 +3,8 @@ require './ms_tile.rb'
 require './ms_board.rb'
 
 class Game
+  attr_accessor :board
+  
   def validate_input(prompt, input_type, &prc)
     # debugger
     done = false
@@ -23,14 +25,42 @@ class Game
     
   def setup
     puts "Welcome to Minesweeper!"
-    size = validate_input("How large should the game board be? Integer" + 
-      " please.", :Fixnum) { |num| num >= 1 }
+    # size = validate_input("How large should the game board be? Integer" + 
+    #   " please.", :Fixnum) { |num| num >= 1 }
+    size = get_board_size
+    mines = get_mine_count
   
-    bombs = validate_input("How many mines would you like on " + 
-      "the board?", :Fixnum) { |num| num < size * size }
-    
-    board = Board.new(size, bombs)
+    # bombs = validate_input("How many mines would you like on " + 
+    #   "the board?", :Fixnum) { |num| num < size * size }
+    # 
+    @board = Board.new(size, mines)
   end
+  
+  def get_board_size
+    puts "How large should the game board be? Please enter a number N for a " +
+      "N x N board."
+    size = gets.chomp.to_i
+    
+    until size > 0
+      puts "Please enter a valid board size."
+      size = gets.chomp_to_i
+    end
+    
+    size
+  end
+  
+  def get_mine_count
+    puts "How many mines would you like on the board?"
+    count = gets.chomp.to_i
+    
+    until count > 0
+      puts "Please enter a mine count > 0"
+      count = gets.chomp.to_i
+    end
+    
+    count
+  end
+  
   
   def play
     board = setup
