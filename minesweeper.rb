@@ -5,34 +5,10 @@ require './ms_board.rb'
 class Game
   attr_accessor :board
   
-  def validate_input(prompt, input_type, &prc)
-    # debugger
-    done = false
-    until done
-      puts prompt
-      case input_type
-      when :String
-        input = gets.chomp.rstrip.downcase
-      when :Array
-        input = gets.chomp.split(/[,\[\]\s]/).reject {|el| el.empty?}.map {|n| n.to_i}
-      when :Fixnum
-        input = gets.chomp.to_i
-      end
-      done = prc.call(input)
-    end
-    return input
-  end
-    
   def setup
     puts "Welcome to Minesweeper!"
-    # size = validate_input("How large should the game board be? Integer" + 
-    #   " please.", :Fixnum) { |num| num >= 1 }
     size = get_board_size
     mines = get_mine_count
-  
-    # bombs = validate_input("How many mines would you like on " + 
-    #   "the board?", :Fixnum) { |num| num < size * size }
-    # 
     @board = Board.new(size, mines)
   end
   
@@ -61,6 +37,18 @@ class Game
     count
   end
   
+  def flag_or_reveal
+    puts "Would you like to reveal or flag a square? Enter 'f' for flag, 
+      'r' for reveal."
+    input = gets.chomp
+    until ["f", "r"].include?(input)
+      puts "Please enter a valid action."
+      input = gets.chomp
+    end
+    
+    input
+  end
+  
   
   def play
     board = setup
@@ -68,7 +56,8 @@ class Game
     keep_playing = true
     while keep_playing
       board.print_user
-      action = validate_input("Flag or Reveal?", :String) {|x| ["f","r"].include?(x)}
+      action = flag_or_reveal
+      # action = validate_input("Flag or Reveal?", :String) {|x| ["f","r"].include?(x)}
       tile_coord = validate_input("Which tile?", :Array) {|x| x.all? { |coord| coord < board.size && coord >= 0 } }
       tile = board.tiles[tile_coord[0]][tile_coord[1]]
       keep_playing = tile.explore if action == "r"
