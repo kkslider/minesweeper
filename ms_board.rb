@@ -1,3 +1,5 @@
+require './ms_tile.rb'
+
 class Board
   attr_reader :size, :tiles
   
@@ -27,6 +29,10 @@ class Board
         tiles[x_coord][y_coord].coord = [x_coord, y_coord]
       end
     end
+  end
+  
+  def game_over?
+    false
   end
   
   def print_full_board
@@ -60,12 +66,15 @@ class Board
             print " #{tile.nearby_bombs} "
           end
         else
-          print " * "
+          if tile.flagged
+            print " F "
+          else
+            print " * "
+          end
         end
       end
       puts
     end
     return nil
-  end
-  
+  end  
 end

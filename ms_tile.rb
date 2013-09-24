@@ -1,3 +1,5 @@
+require './ms_board.rb'
+
 class Tile
   attr_accessor :has_bomb, :board, :coord, :nearby_bombs, :revealed, :flagged
   
