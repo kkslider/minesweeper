@@ -23,9 +23,11 @@ class Game
     
   def setup
     puts "Welcome to Minesweeper!"
-    size = validate_input("How large should the game board be? Integer please.", :Fixnum) { |num| num >= 1 }
+    size = validate_input("How large should the game board be? Integer" + 
+      " please.", :Fixnum) { |num| num >= 1 }
   
-    bombs = validate_input("How many mines would you like on the board?", :Fixnum) { |num| num < size * size }
+    bombs = validate_input("How many mines would you like on " + 
+      "the board?", :Fixnum) { |num| num < size * size }
     
     board = Board.new(size, bombs)
   end
@@ -46,8 +48,12 @@ class Game
           board.flags_left += 1
         else
           if board.flags_left > 0
-            tile.flagged = true 
-            board.flags_left -= 1
+            if tile.revealed
+              puts "Tile has already been revealed!"
+            else
+              tile.flagged = true 
+              board.flags_left -= 1
+            end
           else
             puts "You have no flags left!"
           end
