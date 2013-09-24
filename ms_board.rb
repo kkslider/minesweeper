@@ -1,11 +1,14 @@
 require './ms_tile.rb'
 
 class Board
-  attr_reader :size, :tiles, :game_lost
+  attr_reader :size, :tiles, :game_lost, :bomb_tiles
+  attr_accessor :flags_left
   
   def initialize(size=9, bombs=10)
     @tiles = Array.new(size) {Array.new(size) {Tile.new(self)}}
     @size = size
+    @bomb_tiles = []
+    @flags_left = bombs
     set_tile_coord
     place_bombs(bombs)
   end
@@ -17,6 +20,7 @@ class Board
       y = (0...size).to_a.sample
       unless @tiles[x][y].has_bomb
         @tiles[x][y].has_bomb = true
+        @bomb_tiles << @tiles[x][y]
         bombs_placed += 1
       end
     end
@@ -32,10 +36,11 @@ class Board
   end
   
   def game_over?
-    false
+    return true if @bomb_tiles.all? { |tile| tile.flagged }
+    return true if @tiles.all? { |row| row.all? { |tile| tile.revealed || tile.has_bomb } }
   end
   
-  def print_full_board
+  def print_full
     @tiles.each_with_index do |row, x_coord|
       row.each_with_index do |col, y_coord|
         tile = @tiles[x_coord][y_coord]
